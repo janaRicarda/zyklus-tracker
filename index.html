@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover"/>
+  <title>Zyklus Tracker</title>
+
+  <!-- PWA -->
+  <link rel="manifest" href="manifest.json" />
+  <meta name="theme-color" content="#c96f6f" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+  <meta name="apple-mobile-web-app-title" content="Zyklus" />
+  <link rel="apple-touch-icon" href="icon-192.png" />
+
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <style>
+    :root {
+      --rose:      #e8a0a0;
+      --rose-deep: #c96f6f;
+      --blush:     #f7e8e8;
+      --fertile:   #a8d5b5;
+      --fertile-bg:#e8f5ec;
+      --period:    #e8a0a0;
+      --period-bg: #fceaea;
+      --text:      #3a2a2a;
+      --muted:     #a08080;
+      --bg:        #fdf6f6;
+      --card:      #ffffff;
+      --border:    #f0dede;
+      --shadow:    0 4px 24px rgba(180,100,100,0.08);
+    }
+
+    *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: 'DM Sans', sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+      min-height: 100dvh;
+      padding: 2rem 1rem 4rem;
+      padding-bottom: max(4rem, env(safe-area-inset-bottom));
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .container {
+      max-width: 560px;
+      margin: 0 auto;
+    }
+
+    header {
+      text-align: center;
+      margin-bottom: 2.5rem;
+      animation: fadeDown 0.6s ease both;
+    }
+
+    header h1 {
+      font-family: 'Playfair Display', serif;
+      font-size: 2.2rem;
+      color: var(--rose-deep);
+      letter-spacing: -0.5px;
+    }
+
+    header p {
+      font-size: 0.9rem;
+      color: var(--muted);
+      margin-top: 0.3rem;
+    }
+
+    .card {
+      background: var(--card);
+      border-radius: 20px;
+      padding: 1.8rem;
+      box-shadow: var(--shadow);
+      border: 1px solid var(--border);
+      margin-bottom: 1.5rem;
+      animation: fadeUp 0.5s ease both;
+    }
+
+    .card:nth-child(2) { animation-delay: 0.1s; }
+    .card:nth-child(3) { animation-delay: 0.2s; }
+    .card:nth-child(4) { animation-delay: 0.3s; }
+
+    .card h2 {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.1rem;
+      color: var(--rose-deep);
+      margin-bottom: 1rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .input-row {
+      display: flex;
+      gap: 0.8rem;
+      align-items: flex-end;
+      flex-wrap: wrap;
+    }
+
+    .field {
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+      flex: 1;
+      min-width: 120px;
+    }
+
+    label {
+      font-size: 0.78rem;
+      color: var(--muted);
+      font-weight: 500;
+      letter-spacing: 0.04em;
+      text-transform: uppercase;
+    }
+
+    input[type="date"],
+    input[type="number"] {
+      border: 1.5px solid var(--border);
+      border-radius: 10px;
+      padding: 0.75rem 0.8rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      color: var(--text);
+      background: var(--blush);
+      outline: none;
+      transition: border-color 0.2s;
+      width: 100%;
+      min-height: 48px;
+    }
+
+    input:focus {
+      border-color: var(--rose-deep);
+    }
+
+    button {
+      background: var(--rose-deep);
+      color: #fff;
+      border: none;
+      border-radius: 10px;
+      padding: 0.75rem 1.4rem;
+      font-family: 'DM Sans', sans-serif;
+      font-size: 1rem;
+      font-weight: 500;
+      cursor: pointer;
+      transition: background 0.2s, transform 0.1s;
+      white-space: nowrap;
+      min-height: 48px;
+      touch-action: manipulation;
+    }
+
+    button:hover  { background: #b85a5a; }
+    button:active { transform: scale(0.97); }
+
+    /* Calendar */
+    .calendar-header {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      margin-bottom: 1rem;
+    }
+
+    .calendar-header span {
+      font-family: 'Playfair Display', serif;
+      font-size: 1rem;
+      color: var(--text);
+    }
+
+    .cal-nav {
+      background: var(--blush);
+      color: var(--rose-deep);
+      border: none;
+      border-radius: 8px;
+      padding: 0.3rem 0.8rem;
+      cursor: pointer;
+      font-size: 1rem;
+      transition: background 0.2s;
+    }
+
+    .cal-nav:hover { background: var(--border); }
+
+    .calendar-grid {
+      display: grid;
+      grid-template-columns: repeat(7, 1fr);
+      gap: 4px;
+    }
+
+    .day-name {
+      text-align: center;
+      font-size: 0.7rem;
+      color: var(--muted);
+      font-weight: 500;
+      text-transform: uppercase;
+      padding: 4px 0;
+      letter-spacing: 0.05em;
+    }
+
+    .day-cell {
+      aspect-ratio: 1;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.82rem;
+      cursor: default;
+      transition: background 0.2s;
+      position: relative;
+    }
+
+    .day-cell.empty { background: transparent; }
+
+    .day-cell.normal { background: transparent; color: var(--text); }
+
+    .day-cell.period {
+      background: var(--period-bg);
+      color: var(--rose-deep);
+      font-weight: 600;
+    }
+
+    .day-cell.fertile {
+      background: var(--fertile-bg);
+      color: #4a8c5c;
+      font-weight: 500;
+    }
+
+    .day-cell.ovulation {
+      background: var(--fertile);
+      color: #fff;
+      font-weight: 700;
+    }
+
+    .day-cell.today {
+      outline: 2px solid var(--rose-deep);
+      outline-offset: 1px;
+    }
+
+    /* Legend */
+    .legend {
+      display: flex;
+      gap: 1rem;
+      flex-wrap: wrap;
+      margin-top: 1rem;
+    }
+
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-size: 0.78rem;
+      color: var(--muted);
+    }
+
+    .legend-dot {
+      width: 12px;
+      height: 12px;
+      border-radius: 50%;
+    }
+
+    /* Stats */
+    .stats-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+    }
+
+    .stat-box {
+      background: var(--blush);
+      border-radius: 14px;
+      padding: 1rem;
+      text-align: center;
+    }
+
+    .stat-box .value {
+      font-family: 'Playfair Display', serif;
+      font-size: 1.6rem;
+      color: var(--rose-deep);
+      display: block;
+    }
+
+    .stat-box .stat-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+      margin-top: 0.2rem;
+      text-transform: uppercase;
+      letter-spacing: 0.04em;
+    }
+
+    /* History */
+    .history-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+    }
+
+    .history-list li {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      background: var(--blush);
+      border-radius: 10px;
+      padding: 0.6rem 0.9rem;
+      font-size: 0.88rem;
+    }
+
+    .history-list .del-btn {
+      background: transparent;
+      color: var(--muted);
+      padding: 0;
+      font-size: 1rem;
+      line-height: 1;
+    }
+
+    .history-list .del-btn:hover { color: var(--rose-deep); background: transparent; }
+
+    .empty-state {
+      text-align: center;
+      color: var(--muted);
+      font-size: 0.88rem;
+      padding: 1rem 0;
+    }
+
+    @keyframes fadeDown {
+      from { opacity: 0; transform: translateY(-16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+  </style>
+</head>
+<body>
+<div class="container">
+  <header>
+    <h1>🌸 Zyklus Tracker</h1>
+    <p>Einfach & privat — alles lokal in deinem Browser</p>
+  </header>
+
+  <!-- Eintragen -->
+  <div class="card">
+    <h2>🩸 Zyklusbeginn eintragen</h2>
+    <div class="input-row">
+      <div class="field">
+        <label>Datum</label>
+        <input type="date" id="startDate" />
+      </div>
+      <div class="field" style="max-width:130px">
+        <label>Zykluslänge (Tage)</label>
+        <input type="number" id="cycleLen" value="28" min="18" max="45" />
+      </div>
+      <button onclick="addCycle()">Speichern</button>
+    </div>
+  </div>
+
+  <!-- Kalender -->
+  <div class="card" id="calendarCard">
+    <h2>📅 Kalender</h2>
+    <div class="calendar-header">
+      <button class="cal-nav" onclick="prevMonth()">‹</button>
+      <span id="calTitle"></span>
+      <button class="cal-nav" onclick="nextMonth()">›</button>
+    </div>
+    <div class="calendar-grid" id="calGrid"></div>
+    <div class="legend">
+      <div class="legend-item"><div class="legend-dot" style="background:var(--period-bg);border:1.5px solid var(--rose)"></div> Periode</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--fertile-bg);border:1.5px solid var(--fertile)"></div> Fruchtbar</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--fertile)"></div> Eisprung</div>
+      <div class="legend-item"><div class="legend-dot" style="background:transparent;outline:2px solid var(--rose-deep);outline-offset:1px"></div> Heute</div>
+    </div>
+  </div>
+
+  <!-- Stats -->
+  <div class="card" id="statsCard" style="display:none">
+    <h2>📊 Übersicht</h2>
+    <div class="stats-grid">
+      <div class="stat-box">
+        <span class="value" id="statNext">–</span>
+        <div class="stat-label">Tage bis nächste Periode</div>
+      </div>
+      <div class="stat-box">
+        <span class="value" id="statLen">–</span>
+        <div class="stat-label">Ø Zykluslänge</div>
+      </div>
+      <div class="stat-box">
+        <span class="value" id="statFertile">–</span>
+        <div class="stat-label">Fruchtbare Tage</div>
+      </div>
+      <div class="stat-box">
+        <span class="value" id="statOvul">–</span>
+        <div class="stat-label">Eisprung (Datum)</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Verlauf -->
+  <div class="card">
+    <h2>🗓 Verlauf</h2>
+    <ul class="history-list" id="historyList">
+      <li class="empty-state" id="emptyMsg">Noch keine Einträge.</li>
+    </ul>
+  </div>
+</div>
+
+<script>
+  // ── State ──────────────────────────────────────────────
+  let entries = JSON.parse(localStorage.getItem('zyklusEntries') || '[]');
+  // entries: [{ date: 'YYYY-MM-DD', cycleLen: number }]
+
+  let calYear, calMonth;
+  const today = new Date();
+  calYear  = today.getFullYear();
+  calMonth = today.getMonth();
+
+  // ── Init ──────────────────────────────────────────────
+  document.getElementById('startDate').value = toISO(today);
+  render();
+
+  // ── Add ───────────────────────────────────────────────
+  function addCycle() {
+    const date = document.getElementById('startDate').value;
+    const len  = parseInt(document.getElementById('cycleLen').value);
+    if (!date) return alert('Bitte ein Datum wählen.');
+    if (isNaN(len) || len < 18 || len > 45) return alert('Zykluslänge muss zwischen 18 und 45 Tagen liegen.');
+
+    // avoid duplicates
+    entries = entries.filter(e => e.date !== date);
+    entries.push({ date, cycleLen: len });
+    entries.sort((a,b) => a.date.localeCompare(b.date));
+    save();
+    render();
+  }
+
+  function deleteEntry(date) {
+    entries = entries.filter(e => e.date !== date);
+    save();
+    render();
+  }
+
+  function save() {
+    localStorage.setItem('zyklusEntries', JSON.stringify(entries));
+  }
+
+  // ── Compute phase sets ────────────────────────────────
+  function computePhases() {
+    // returns sets of ISO dates for period, fertile, ovulation
+    const periodDates   = new Set();
+    const fertileDates  = new Set();
+    const ovulDates     = new Set();
+
+    entries.forEach(({ date, cycleLen }) => {
+      const start = parseDate(date);
+      // period: days 1-5
+      for (let d = 0; d < 5; d++) periodDates.add(toISO(addDays(start, d)));
+      // ovulation: day cycleLen - 14
+      const ovulDay = cycleLen - 14;
+      const ovul    = addDays(start, ovulDay - 1);
+      ovulDates.add(toISO(ovul));
+      // fertile: 5 days before ovulation + ovulation day + 1 day after
+      for (let d = -5; d <= 1; d++) {
+        const fd = addDays(ovul, d);
+        if (!periodDates.has(toISO(fd))) fertileDates.add(toISO(fd));
+      }
+    });
+
+    return { periodDates, fertileDates, ovulDates };
+  }
+
+  // ── Render ────────────────────────────────────────────
+  function render() {
+    renderCalendar();
+    renderStats();
+    renderHistory();
+  }
+
+  function renderCalendar() {
+    const { periodDates, fertileDates, ovulDates } = computePhases();
+    const title = new Date(calYear, calMonth, 1)
+      .toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
+    document.getElementById('calTitle').textContent = title;
+
+    const grid  = document.getElementById('calGrid');
+    grid.innerHTML = '';
+
+    const dayNames = ['Mo','Di','Mi','Do','Fr','Sa','So'];
+    dayNames.forEach(d => {
+      const el = document.createElement('div');
+      el.className = 'day-name';
+      el.textContent = d;
+      grid.appendChild(el);
+    });
+
+    const firstDay = new Date(calYear, calMonth, 1);
+    // Mon=0 … Sun=6
+    let startOffset = firstDay.getDay() - 1;
+    if (startOffset < 0) startOffset = 6;
+
+    for (let i = 0; i < startOffset; i++) {
+      const el = document.createElement('div');
+      el.className = 'day-cell empty';
+      grid.appendChild(el);
+    }
+
+    const daysInMonth = new Date(calYear, calMonth + 1, 0).getDate();
+    const todayISO    = toISO(today);
+
+    for (let d = 1; d <= daysInMonth; d++) {
+      const iso = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
+      const el  = document.createElement('div');
+
+      let cls = 'day-cell ';
+      if      (ovulDates.has(iso))    cls += 'ovulation';
+      else if (fertileDates.has(iso)) cls += 'fertile';
+      else if (periodDates.has(iso))  cls += 'period';
+      else                            cls += 'normal';
+
+      if (iso === todayISO) cls += ' today';
+      el.className  = cls;
+      el.textContent = d;
+      grid.appendChild(el);
+    }
+  }
+
+  function renderStats() {
+    if (entries.length === 0) {
+      document.getElementById('statsCard').style.display = 'none';
+      return;
+    }
+    document.getElementById('statsCard').style.display = '';
+
+    // latest entry
+    const last    = entries[entries.length - 1];
+    const start   = parseDate(last.date);
+    const len     = last.cycleLen;
+    const nextPer = addDays(start, len);
+    const ovul    = addDays(start, len - 14 - 1);
+
+    const daysUntil = Math.round((nextPer - today) / 86400000);
+
+    // fertile window label
+    const fertStart = addDays(ovul, -5);
+    const fertEnd   = addDays(ovul, 1);
+    const fertLabel = `${fertStart.getDate()}.–${fertEnd.getDate()}.`;
+
+    // avg cycle length
+    const avgLen = Math.round(entries.reduce((s,e) => s + e.cycleLen, 0) / entries.length);
+
+    document.getElementById('statNext').textContent   = daysUntil >= 0 ? daysUntil : 0;
+    document.getElementById('statLen').textContent    = avgLen + ' d';
+    document.getElementById('statFertile').textContent = fertLabel;
+    document.getElementById('statOvul').textContent   = ovul.getDate() + '.' + (ovul.getMonth()+1) + '.';
+  }
+
+  function renderHistory() {
+    const list = document.getElementById('historyList');
+    list.innerHTML = '';
+
+    if (entries.length === 0) {
+      list.innerHTML = '<li class="empty-state" id="emptyMsg">Noch keine Einträge.</li>';
+      return;
+    }
+
+    [...entries].reverse().forEach(({ date, cycleLen }) => {
+      const li  = document.createElement('li');
+      const d   = parseDate(date);
+      const fmt = d.toLocaleDateString('de-DE', { day:'2-digit', month:'long', year:'numeric' });
+      li.innerHTML = `
+        <span>${fmt}</span>
+        <span style="color:var(--muted);font-size:0.8rem">${cycleLen} Tage</span>
+        <button class="del-btn" onclick="deleteEntry('${date}')" title="Löschen">✕</button>
+      `;
+      list.appendChild(li);
+    });
+  }
+
+  // ── Calendar navigation ───────────────────────────────
+  function prevMonth() {
+    calMonth--;
+    if (calMonth < 0) { calMonth = 11; calYear--; }
+    renderCalendar();
+  }
+  function nextMonth() {
+    calMonth++;
+    if (calMonth > 11) { calMonth = 0; calYear++; }
+    renderCalendar();
+  }
+
+  // ── Service Worker ────────────────────────────────────
+  if ('serviceWorker' in navigator) {
+    window.addEventListener('load', () => {
+      navigator.serviceWorker.register('sw.js').catch(() => {});
+    });
+  }
+
+  // ── Helpers ───────────────────────────────────────────
+  function toISO(d) {
+    return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+  }
+  function parseDate(iso) {
+    const [y,m,d] = iso.split('-').map(Number);
+    return new Date(y, m-1, d);
+  }
+  function addDays(d, n) {
+    const r = new Date(d);
+    r.setDate(r.getDate() + n);
+    return r;
+  }
+</script>
+</body>
+</html>
