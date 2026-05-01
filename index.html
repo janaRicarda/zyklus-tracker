@@ -13,30 +13,50 @@
   <meta name="apple-mobile-web-app-title" content="Zyklus" />
   <link rel="apple-touch-icon" href="icon-192.png" />
 
-  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;1,400&family=DM+Sans:wght@300;400;500&display=swap" rel="stylesheet"/>
+  <link href="https://fonts.googleapis.com/css2?family=Abril+Fatface&family=Gravitas+One&display=swap" rel="stylesheet">
   <style>
     :root {
-      --rose:      #f5abc1;
-      --rose-deep: #f04f81;
-      --blush:     #f7e8e8;
-      --fertile:   #a8d5b5;
-      --fertile-bg:#e8f5ec;
-      --period:    #e8a0a0;
-      --period-bg: #fceaea;
-      --text:      #bb44bb;
-      --muted:     #a08080;
-      --bg:        #ffaaaa;
-      --bg-2:      #ffff87;
-      --card:      #ffffff;
-      --border:    #f0dede;
-      --shadow:    0 4px 24px rgba(180,100,100,0.08);
+      --rose:         #f5abc1;
+      --rose-deep:    #f04f81;
+      --blush:        #f7e8e8;
+      /* Menstruation */
+      --period-bg:    #fab3b4;
+      --period-text:  #985252;
+      /* Follikelphase */
+      --follic-bg:    #ebf38a;
+      --follic-text:  #c8841a;
+      /* Ovulation */
+      --ovul-bg:      #87d69d;
+      --ovul-text:    #ffffff;
+      /* Lutealphase */
+      --luteal-bg:    #d8c3fa;
+      --luteal-text:  #7c5cbf;
+      /* fertile window within follic */
+      --fertile-bg:   #d3fbdf;
+      --fertile-text: #4a8c5c;
+      --text:         #3a2a2a;
+      --caption:      #3220a8;
+      --muted:        #a08080;
+      --bg:           #ffaaaa;
+      --bg-2:         #ffff87;
+      --color-1: #ffaaaa;
+--color-2: #ffff87;
+--color-3: #d4bdff;
+      --card:         #ffffff;
+      --border:       #f0dede;
+      --shadow:       0 4px 24px rgba(180,100,100,0.08);
     }
 
     *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
 
     body {
       font-family: 'DM Sans', sans-serif;
-      background: linear-gradient(var(--bg), var(--bg-2));
+      background: linear-gradient(
+    135deg,
+    #ffaaaa 0%,
+    #ffff87 50%,
+    #d4bdff 100%
+  );
       color: var(--text);
       min-height: 100vh;
       min-height: 100dvh;
@@ -55,12 +75,32 @@
       margin-bottom: 2.5rem;
       animation: fadeDown 0.6s ease both;
     }
+     header .moon {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.2rem;
+  
+    }
+    header .moon .quarter {
+    font-size: 2rem;
+    }
+      header .moon .half {
+      font-size: 2.5rem;
+    }
+      header .moon .three-quarter {
+      font-size: 3rem;
+    }
+      header .moon .full {
+      font-size: 3.5rem;
+    }
 
     header h1 {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Abril fatface', serif;
       font-size: 2.2rem;
-      color: var(--rose-deep);
+      color: var(--caption);
       letter-spacing: -0.5px;
+      text-transform: uppercase;
     }
 
     header p {
@@ -70,7 +110,9 @@
     }
 
     .card {
-      background: var(--card);
+      background: rgba(255, 255, 255, 0.8);
+      backdrop-filter: blur(4.4px);
+-webkit-backdrop-filter: blur(4.4px);
       border-radius: 20px;
       padding: 1.8rem;
       box-shadow: var(--shadow);
@@ -84,9 +126,12 @@
     .card:nth-child(4) { animation-delay: 0.3s; }
 
     .card h2 {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Abril Fatface', serif;
       font-size: 1.1rem;
-      color: var(--rose-deep);
+      text-align: right;
+      width: 100%;
+      text-transform: uppercase;
+      color: var(--caption);
       margin-bottom: 1rem;
       display: flex;
       align-items: center;
@@ -163,7 +208,7 @@
     }
 
     .calendar-header span {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Abril Fatface', serif;
       font-size: 1rem;
       color: var(--text);
     }
@@ -209,31 +254,47 @@
       position: relative;
     }
 
-    .day-cell.empty { background: transparent; }
-
+    .day-cell.empty  { background: transparent; }
     .day-cell.normal { background: transparent; color: var(--text); }
 
+    /* Follikelphase: gelbe Basis für den gesamten ersten Zyklusabschnitt */
+    .day-cell.follicular {
+      background: var(--follic-bg);
+      color: var(--follic-text);
+    }
+
+    /* Menstruation: stärkere rosa Überlagerung auf gelber Basis */
     .day-cell.period {
       background: var(--period-bg);
-      color: var(--rose-deep);
-      font-weight: 600;
+      color: var(--period-text);
+      font-weight: 700;
+      box-shadow: inset 0 0 0 2px var(--rose);
     }
 
+    /* Fruchtbar: grüne Überlagerung auf gelber Basis */
     .day-cell.fertile {
       background: var(--fertile-bg);
-      color: #4a8c5c;
-      font-weight: 500;
+      color: var(--fertile-text);
+      font-weight: 600;
+      box-shadow: inset 0 0 0 2px #7abb8e;
     }
 
+    /* Eisprung: satt grün, deutlichste Markierung */
     .day-cell.ovulation {
-      background: var(--fertile);
-      color: #fff;
+      background: var(--ovul-bg);
+      color: var(--ovul-text);
       font-weight: 700;
+    }
+
+    /* Lutealphase: lila Basis für zweiten Zyklusabschnitt */
+    .day-cell.luteal {
+      background: var(--luteal-bg);
+      color: var(--luteal-text);
     }
 
     .day-cell.today {
       outline: 2px solid var(--rose-deep);
-      outline-offset: 1px;
+      outline-offset: 2px;
     }
 
     /* Legend */
@@ -273,9 +334,9 @@
     }
 
     .stat-box .value {
-      font-family: 'Playfair Display', serif;
+      font-family: 'Abril Fatface', serif;
       font-size: 1.6rem;
-      color: var(--rose-deep);
+      color: var(--caption);
       display: block;
     }
 
@@ -322,6 +383,46 @@
       padding: 1rem 0;
     }
 
+    /* Phase info cards */
+    .phases-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.8rem;
+    }
+
+    .phase-tile {
+      border-radius: 14px;
+      padding: 0.9rem 1rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.3rem;
+      hyphens: auto;
+    }
+
+    .phase-tile .phase-name {
+      font-weight: 600;
+      font-size: 0.82rem;
+      display: flex;
+      align-items: center;
+      gap: 0.3rem;
+    }
+
+    .phase-tile .phase-days {
+      font-size: 0.72rem;
+      opacity: 0.7;
+    }
+
+    .phase-tile .phase-desc {
+      font-size: 0.78rem;
+      line-height: 1.45;
+      margin-top: 0.2rem;
+    }
+
+    .phase-tile.menstruation { background: var(--period-bg);  color: var(--period-text); }
+    .phase-tile.follikel     { background: var(--follic-bg);  color: var(--follic-text); }
+    .phase-tile.ovulationsph { background: var(--ovul-bg);    color: var(--ovul-text); }
+    .phase-tile.luteal-tile  { background: var(--luteal-bg);  color: var(--luteal-text); }
+
     @keyframes fadeDown {
       from { opacity: 0; transform: translateY(-16px); }
       to   { opacity: 1; transform: translateY(0); }
@@ -336,30 +437,44 @@
 <body>
 <div class="container">
   <header>
-    <p>🌕</p>
+     <p class="moon">
+      <span class="quarter">🌒</span>
+      <span class="half">🌓</span>
+      <span class="three-quarter">🌔</span>
+      <span class="full">🌕</span> 
+      <span class="three-quarter">🌖</span>
+      <span class="half">🌗</span>
+      <span class="quarter">🌘</span> </p>
     <h1>Zyklus Tracker</h1>
     <p>Einfach & privat — alles lokal in deinem Browser</p>
   </header>
 
   <!-- Eintragen -->
   <div class="card">
-    <h2>🩸 Zyklusbeginn eintragen</h2>
+    <h2>Zyklusbeginn eintragen</h2>
     <div class="input-row">
       <div class="field">
-        <label>Datum</label>
+        <label>🌑 Datum 1. Tag Periode</label>
         <input type="date" id="startDate" />
-      </div>
-      <div class="field" style="max-width:130px">
-        <label>Zykluslänge (Tage)</label>
-        <input type="number" id="cycleLen" value="28" min="18" max="45" />
       </div>
       <button onclick="addCycle()">Speichern</button>
     </div>
+    <div style="margin-top:1rem;padding-top:1rem;border-top:1px solid var(--border)">
+      <div class="input-row">
+        <div class="field">
+          <label>🌕 Eisprung bestätigt (optional)</label>
+          <input type="date" id="ovulDate" />
+        </div>
+        <button onclick="saveOvulation()" style="background:#87d69d;color:#fff">Eintragen</button>
+      </div>
+      <p style="margin-top:0.5rem;font-size:0.78rem;color:var(--muted)">Falls du deinen genauen Eisprung kennst (z.B. per LH-Test oder Basaltemperatur).</p>
+    </div>
+    <p id="hintMsg" style="margin-top:0.8rem;font-size:0.8rem;color:var(--muted)"></p>
   </div>
 
   <!-- Kalender -->
   <div class="card" id="calendarCard">
-    <h2>📅 Kalender</h2>
+    <h2>Kalender</h2>
     <div class="calendar-header">
       <button class="cal-nav" onclick="prevMonth()">‹</button>
       <span id="calTitle"></span>
@@ -367,16 +482,45 @@
     </div>
     <div class="calendar-grid" id="calGrid"></div>
     <div class="legend">
-      <div class="legend-item"><div class="legend-dot" style="background:var(--period-bg);border:1.5px solid var(--rose)"></div> Periode</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--fertile-bg);border:1.5px solid var(--fertile)"></div> Fruchtbar</div>
-      <div class="legend-item"><div class="legend-dot" style="background:var(--fertile)"></div> Eisprung</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--follic-bg)"></div> Follikelphase</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--period-bg);box-shadow:inset 0 0 0 2px #e8a0a0"></div> Menstruation</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--fertile-bg);box-shadow:inset 0 0 0 2px #7abb8e"></div> Fruchtbar</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--ovul-bg)"></div> Eisprung</div>
+      <div class="legend-item"><div class="legend-dot" style="background:var(--luteal-bg)"></div> Lutealphase</div>
       <div class="legend-item"><div class="legend-dot" style="background:transparent;outline:2px solid var(--rose-deep);outline-offset:1px"></div> Heute</div>
+    </div>
+  </div>
+
+  <!-- Phasen Info -->
+  <div class="card">
+    <h2>Die vier Phasen</h2>
+    <div class="phases-grid">
+      <div class="phase-tile menstruation">
+        <div class="phase-name">🌑 Menstruation</div>
+        <div class="phase-days">Tag 1–5</div>
+        <div class="phase-desc">Die Gebärmutterschleimhaut löst sich ab. Viele fühlen sich müde oder krämpfen – Ruhe ist erlaubt.</div>
+      </div>
+      <div class="phase-tile follikel">
+        <div class="phase-name">🌓 Follikelphase</div>
+        <div class="phase-days">Tag 6 bis Eisprung</div>
+        <div class="phase-desc">Östrogen steigt, Energie kehrt zurück. Oft fühlt man sich fokussiert, offen und kreativ.</div>
+      </div>
+      <div class="phase-tile ovulationsph">
+        <div class="phase-name">🌕 Ovulation</div>
+        <div class="phase-days">ca. 1 Tag</div>
+        <div class="phase-desc">Der Eisprung: der fruchtbarste Moment. Viele erleben ein Hoch an Energie, Stimmung und Libido.</div>
+      </div>
+      <div class="phase-tile luteal-tile">
+        <div class="phase-name">🌗 Lutealphase</div>
+        <div class="phase-days">Eisprung bis Periode</div>
+        <div class="phase-desc">Progesteron dominiert. Stimmung kann schwanken, der Körper bereitet sich auf die nächste Periode vor.</div>
+      </div>
     </div>
   </div>
 
   <!-- Stats -->
   <div class="card" id="statsCard" style="display:none">
-    <h2>📊 Übersicht</h2>
+    <h2>Übersicht</h2>
     <div class="stats-grid">
       <div class="stat-box">
         <span class="value" id="statNext">–</span>
@@ -399,7 +543,7 @@
 
   <!-- Verlauf -->
   <div class="card">
-    <h2>🗓 Verlauf</h2>
+    <h2>Verlauf</h2>
     <ul class="history-list" id="historyList">
       <li class="empty-state" id="emptyMsg">Noch keine Einträge.</li>
     </ul>
@@ -408,8 +552,12 @@
 
 <script>
   // ── State ──────────────────────────────────────────────
-  let entries = JSON.parse(localStorage.getItem('zyklusEntries') || '[]');
-  // entries: [{ date: 'YYYY-MM-DD', cycleLen: number }]
+  // entries: [{ date: 'YYYY-MM-DD' }]
+  // ovulations: { 'YYYY-MM-DD': 'YYYY-MM-DD' } — periodDate -> confirmed ovul date
+  let entries    = JSON.parse(localStorage.getItem('zyklusEntries') || '[]');
+  let ovulations = JSON.parse(localStorage.getItem('zyklusOvulations') || '{}');
+  // Migrate old format (with cycleLen) to new format
+  entries = entries.map(e => ({ date: e.date }));
 
   let calYear, calMonth;
   const today = new Date();
@@ -423,14 +571,11 @@
   // ── Add ───────────────────────────────────────────────
   function addCycle() {
     const date = document.getElementById('startDate').value;
-    const len  = parseInt(document.getElementById('cycleLen').value);
     if (!date) return alert('Bitte ein Datum wählen.');
-    if (isNaN(len) || len < 18 || len > 45) return alert('Zykluslänge muss zwischen 18 und 45 Tagen liegen.');
 
-    // avoid duplicates
     entries = entries.filter(e => e.date !== date);
-    entries.push({ date, cycleLen: len });
-    entries.sort((a,b) => a.date.localeCompare(b.date));
+    entries.push({ date });
+    entries.sort((a, b) => a.date.localeCompare(b.date));
     save();
     render();
   }
@@ -443,51 +588,136 @@
 
   function save() {
     localStorage.setItem('zyklusEntries', JSON.stringify(entries));
+    localStorage.setItem('zyklusOvulations', JSON.stringify(ovulations));
+  }
+
+  // ── Ovulation ─────────────────────────────────────────
+  function saveOvulation() {
+    const ovulDate = document.getElementById('ovulDate').value;
+    if (!ovulDate) return alert('Bitte ein Datum für den Eisprung wählen.');
+
+    // Find which cycle this ovulation belongs to (the most recent period before it)
+    const ovulD = parseDate(ovulDate);
+    let parentDate = null;
+    for (let i = entries.length - 1; i >= 0; i--) {
+      const entryD = parseDate(entries[i].date);
+      if (entryD <= ovulD) { parentDate = entries[i].date; break; }
+    }
+    if (!parentDate) return alert('Kein Zyklusbeginn vor diesem Datum gefunden.');
+
+    ovulations[parentDate] = ovulDate;
+    document.getElementById('ovulDate').value = '';
+    save();
+    render();
+  }
+
+  function deleteOvulation(parentDate) {
+    delete ovulations[parentDate];
+    save();
+    render();
+  }
+
+  // ── Cycle length calculation ──────────────────────────
+  // Returns avg cycle length from gaps between entries, or null if < 2 entries
+  function avgCycleLength() {
+    if (entries.length < 2) return null;
+    const gaps = [];
+    for (let i = 1; i < entries.length; i++) {
+      const a = parseDate(entries[i - 1].date);
+      const b = parseDate(entries[i].date);
+      gaps.push(Math.round((b - a) / 86400000));
+    }
+    return Math.round(gaps.reduce((s, v) => s + v, 0) / gaps.length);
   }
 
   // ── Compute phase sets ────────────────────────────────
   function computePhases() {
-    // returns sets of ISO dates for period, fertile, ovulation
-    const periodDates   = new Set();
-    const fertileDates  = new Set();
-    const ovulDates     = new Set();
+    const periodDates    = new Set(); // Menstruation: day 1-5
+    const follicDates    = new Set(); // Follikelphase: day 6 to fertile window
+    const fertileDates   = new Set(); // Fruchtbar: 5d before ovul + 1d after
+    const ovulDates      = new Set(); // Eisprung: 1 day
+    const lutealDates    = new Set(); // Lutealphase: ovul+1 to next period
+    const ovulManual     = new Set(); // confirmed ovulations
+    const avgLen         = avgCycleLength();
 
-    entries.forEach(({ date, cycleLen }) => {
+    entries.forEach(({ date }, i) => {
       const start = parseDate(date);
-      // period: days 1-5
+
+      // Determine cycle length for this entry
+      let len = null;
+      if (i + 1 < entries.length) {
+        len = Math.round((parseDate(entries[i + 1].date) - start) / 86400000);
+      } else if (avgLen) {
+        len = avgLen;
+      }
+
+      // Menstruation: days 1–5
       for (let d = 0; d < 5; d++) periodDates.add(toISO(addDays(start, d)));
-      // ovulation: day cycleLen - 14
-      const ovulDay = cycleLen - 14;
-      const ovul    = addDays(start, ovulDay - 1);
+
+      if (!len) return; // can't compute further without a cycle length
+
+      // Ovulation date
+      let ovul;
+      if (ovulations[date]) {
+        ovul = parseDate(ovulations[date]);
+        ovulManual.add(ovulations[date]);
+      } else {
+        ovul = addDays(start, len - 14 - 1);
+      }
       ovulDates.add(toISO(ovul));
-      // fertile: 5 days before ovulation + ovulation day + 1 day after
+
+      // Fertile window: 5 days before ovul + 1 day after
       for (let d = -5; d <= 1; d++) {
         const fd = addDays(ovul, d);
         if (!periodDates.has(toISO(fd))) fertileDates.add(toISO(fd));
       }
+
+      // Follikelphase: Tag 1 bis Eisprung (inkl. Periodetage) als Basisschicht
+      // Menstruation und fruchtbare Tage werden im Kalender stärker dargestellt
+      for (let fd = new Date(start); fd <= ovul; fd = addDays(fd, 1)) {
+        follicDates.add(toISO(fd));
+      }
+
+      // Lutealphase: day after ovul up to next period start
+      const nextStart = addDays(start, len);
+      for (let d = addDays(ovul, 2); d < nextStart; d = addDays(d, 1)) {
+        const iso = toISO(d);
+        if (!fertileDates.has(iso)) lutealDates.add(iso);
+      }
     });
 
-    return { periodDates, fertileDates, ovulDates };
+    return { periodDates, follicDates, fertileDates, ovulDates, lutealDates, ovulManual };
   }
 
   // ── Render ────────────────────────────────────────────
   function render() {
+    renderHint();
     renderCalendar();
     renderStats();
     renderHistory();
   }
 
+  function renderHint() {
+    const hint = document.getElementById('hintMsg');
+    if (entries.length === 0) {
+      hint.textContent = 'Trag deinen ersten Zyklusbeginn ein.';
+    } else if (entries.length === 1) {
+      hint.textContent = 'Noch ein Eintrag, dann berechne ich deinen Rhythmus automatisch. 🌱';
+    } else {
+      hint.textContent = '';
+    }
+  }
+
   function renderCalendar() {
-    const { periodDates, fertileDates, ovulDates } = computePhases();
+    const { periodDates, follicDates, fertileDates, ovulDates, lutealDates, ovulManual } = computePhases();
     const title = new Date(calYear, calMonth, 1)
       .toLocaleDateString('de-DE', { month: 'long', year: 'numeric' });
     document.getElementById('calTitle').textContent = title;
 
-    const grid  = document.getElementById('calGrid');
+    const grid = document.getElementById('calGrid');
     grid.innerHTML = '';
 
-    const dayNames = ['Mo','Di','Mi','Do','Fr','Sa','So'];
-    dayNames.forEach(d => {
+    ['Mo','Di','Mi','Do','Fr','Sa','So'].forEach(d => {
       const el = document.createElement('div');
       el.className = 'day-name';
       el.textContent = d;
@@ -495,10 +725,8 @@
     });
 
     const firstDay = new Date(calYear, calMonth, 1);
-    // Mon=0 … Sun=6
     let startOffset = firstDay.getDay() - 1;
     if (startOffset < 0) startOffset = 6;
-
     for (let i = 0; i < startOffset; i++) {
       const el = document.createElement('div');
       el.className = 'day-cell empty';
@@ -511,48 +739,57 @@
     for (let d = 1; d <= daysInMonth; d++) {
       const iso = `${calYear}-${String(calMonth+1).padStart(2,'0')}-${String(d).padStart(2,'0')}`;
       const el  = document.createElement('div');
-
+      // Priority: ovulation > fertile > period > follicular > luteal
+      // Period and fertile show as overlays (via box-shadow) on the follicular base
       let cls = 'day-cell ';
       if      (ovulDates.has(iso))    cls += 'ovulation';
       else if (fertileDates.has(iso)) cls += 'fertile';
       else if (periodDates.has(iso))  cls += 'period';
+      else if (follicDates.has(iso))  cls += 'follicular';
+      else if (lutealDates.has(iso))  cls += 'luteal';
       else                            cls += 'normal';
-
       if (iso === todayISO) cls += ' today';
-      el.className  = cls;
+      el.className   = cls;
       el.textContent = d;
+      if (ovulManual.has(iso)) {
+        const star = document.createElement('span');
+        star.textContent = '✓';
+        star.style.cssText = 'position:absolute;top:0;right:1px;font-size:0.5rem;line-height:1;';
+        el.appendChild(star);
+      }
       grid.appendChild(el);
     }
   }
 
   function renderStats() {
-    if (entries.length === 0) {
-      document.getElementById('statsCard').style.display = 'none';
+    const statsCard = document.getElementById('statsCard');
+    if (entries.length < 2) {
+      statsCard.style.display = 'none';
       return;
     }
-    document.getElementById('statsCard').style.display = '';
+    statsCard.style.display = '';
 
-    // latest entry
+    const avgLen  = avgCycleLength();
     const last    = entries[entries.length - 1];
     const start   = parseDate(last.date);
-    const len     = last.cycleLen;
-    const nextPer = addDays(start, len);
-    const ovul    = addDays(start, len - 14 - 1);
+    const nextPer = addDays(start, avgLen);
+
+    // Use confirmed ovulation if available, else calculate
+    const ovul = ovulations[last.date]
+      ? parseDate(ovulations[last.date])
+      : addDays(start, avgLen - 14 - 1);
+    const ovulIsConfirmed = !!ovulations[last.date];
 
     const daysUntil = Math.round((nextPer - today) / 86400000);
-
-    // fertile window label
     const fertStart = addDays(ovul, -5);
     const fertEnd   = addDays(ovul, 1);
     const fertLabel = `${fertStart.getDate()}.–${fertEnd.getDate()}.`;
 
-    // avg cycle length
-    const avgLen = Math.round(entries.reduce((s,e) => s + e.cycleLen, 0) / entries.length);
-
-    document.getElementById('statNext').textContent   = daysUntil >= 0 ? daysUntil : 0;
-    document.getElementById('statLen').textContent    = avgLen + ' d';
+    document.getElementById('statNext').textContent    = daysUntil >= 0 ? daysUntil : 0;
+    document.getElementById('statLen').textContent     = avgLen + ' d';
     document.getElementById('statFertile').textContent = fertLabel;
-    document.getElementById('statOvul').textContent   = ovul.getDate() + '.' + (ovul.getMonth()+1) + '.';
+    document.getElementById('statOvul').textContent    =
+      ovul.getDate() + '.' + (ovul.getMonth()+1) + '.' + (ovulIsConfirmed ? ' ✓' : '');
   }
 
   function renderHistory() {
@@ -560,17 +797,33 @@
     list.innerHTML = '';
 
     if (entries.length === 0) {
-      list.innerHTML = '<li class="empty-state" id="emptyMsg">Noch keine Einträge.</li>';
+      list.innerHTML = '<li class="empty-state">Noch keine Einträge.</li>';
       return;
     }
 
-    [...entries].reverse().forEach(({ date, cycleLen }) => {
+    [...entries].reverse().forEach(({ date }, ri) => {
+      // original index in sorted array
+      const i = entries.length - 1 - ri;
       const li  = document.createElement('li');
       const d   = parseDate(date);
       const fmt = d.toLocaleDateString('de-DE', { day:'2-digit', month:'long', year:'numeric' });
+
+      // show gap to next entry as cycle length
+      let lenLabel = '';
+      if (i + 1 < entries.length) {
+        const gap = Math.round((parseDate(entries[i+1].date) - d) / 86400000);
+        lenLabel = `${gap} Tage`;
+      } else if (entries.length >= 2) {
+        lenLabel = `~ ${avgCycleLength()} d (Ø)`;
+      }
+
+      const ovulLabel = ovulations[date]
+        ? `🥚 ${parseDate(ovulations[date]).getDate()}.${parseDate(ovulations[date]).getMonth()+1}. ✓`
+        : '';
       li.innerHTML = `
         <span>${fmt}</span>
-        <span style="color:var(--muted);font-size:0.8rem">${cycleLen} Tage</span>
+        <span style="color:var(--muted);font-size:0.8rem">${lenLabel}</span>
+        <span style="color:#4a8c5c;font-size:0.78rem">${ovulLabel}</span>
         <button class="del-btn" onclick="deleteEntry('${date}')" title="Löschen">✕</button>
       `;
       list.appendChild(li);
